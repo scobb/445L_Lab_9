@@ -63,8 +63,13 @@
 #define SYSCTL_RCGCGPIO_R1      0x00000002  // GPIO Port B Run Mode Clock
                                             // Gating Control
 
-int result[1000];
+
+uint8_t ADC_ready = FALSE;
+int ADC_val;
+
 int cnt = 0;
+int result[1000];
+
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
 long StartCritical (void);    // previous I bit, disable interrupts

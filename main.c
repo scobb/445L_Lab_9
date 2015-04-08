@@ -30,15 +30,35 @@
 #include "PLL.h"
 
 void Output_Init(void);
-
-int main(void){ int32_t data;
+/*
+int main(void){ 
 	PLL_Init();
   Output_Init();              // initialize output device
 	printf("hello world\n");
-	ADC0_InitTimer0ATriggerSeq3(9, 80000);
+	// 1000 Hz with clock at 50MHz
+	ADC0_InitTimer0ATriggerSeq3(9, 50000);
 	while (cnt < 1000);
 	for (int i = 0; i < 1000; ++i){
 		printf("%d\n", result[i]);
 	}
 	while (1);
+}
+*/
+void convert_to_temperature(int* val) {
+	
+}
+int main() {
+	PLL_Init();
+  Output_Init();              // initialize output device
+	printf("hello world\n");
+	// 100 Hz with clock at 50MHz
+	ADC0_InitTimer0ATriggerSeq3(9, 500000);
+	while (1) {
+		while (!ADC_ready);
+		int my_val = ADC_val;
+		ADC_ready = FALSE;
+		convert_to_temperature(&my_val);
+		printf("%d", my_val);
+	}
+	
 }
