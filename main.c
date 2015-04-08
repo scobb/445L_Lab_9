@@ -32,8 +32,22 @@ void Output_Init(void);
 int main(void){ int32_t data;
   Output_Init();              // initialize output device
   ADC0_InitSWTriggerSeq3_Ch9();
+	int32_t ADCVals[1000];
+	for (int32_t i = 0; i < 1000; i++){
+		for (int8_t j = 0; j < 124; j++){
+			ADC0_InSeq3();
+		}
+		ADCVals[i] = ADC0_InSeq3();
+	}
+	
+	printf("ADC Results\n");
+	for (int32_t k = 0; k < 1000; k++){
+		printf("%d", ADCVals[k]);
+	}
+	/*
   while(1){
     data = ADC0_InSeq3();
     printf("\nADC data =%d ",data);
   }
+	*/
 }
