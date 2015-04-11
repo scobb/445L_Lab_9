@@ -23,6 +23,7 @@
  */
 #include <stdint.h>
 #include "inc/tm4c123gh6pm.h"
+#include "ADCT0ATrigger.h"
 #define NVIC_EN0_INT17          0x00020000  // Interrupt 17 enable
 
 #define TIMER_CFG_16_BIT        0x00000004  // 16-bit timer configuration,
@@ -209,8 +210,9 @@ void ADC0_InitTimer0ATriggerSeq3(uint8_t channelNum, uint32_t period){
   }
   DisableInterrupts();
   SYSCTL_RCGCADC_R |= 0x01;     // activate ADC0 
-  SYSCTL_RCGCTIMER_R |= 0x01;   // activate timer0 
-  delay = SYSCTL_RCGCTIMER_R;   // allow time to finish activating
+  SYSCTL_RCGCTIMER_R |= 0x01;   // activate timer0  while((SYSCTL_PRGPIO_R&0x08)==0){};   // allow time for clock to stabilize
+	while (!(SYSCTL_RCGCTIMER_R & 0x01));
+	while (!(SYSCTL_RCGCADC_R & 0x01));
   TIMER0_CTL_R = 0x00000000;    // disable timer0A during setup
   TIMER0_CTL_R |= 0x00000020;   // enable timer0A trigger to ADC
   TIMER0_CFG_R = 0;             // configure for 32-bit timer mode
@@ -266,9 +268,13 @@ void ADC0_InitTimer0ATriggerSeq3PD3(uint32_t period){
 //volatile uint32_t ADCvalue;
 void ADC0Seq3_Handler(void){
   ADC0_ISC_R = 0x08;          // acknowledge ADC sequence 3 completion
-	if (cnt < 1000) {
+	if (!ADC_ready) {
+		ADC_ready = TRUE;
+		ADC_val = ADC0_SSFIFO3_R;
+	}
+	/*if (cnt < 100) {
 		result[cnt] = ADC0_SSFIFO3_R;
 		++cnt;
 		//ADCvalue = ADC0_SSFIFO3_R;  // 12-bit result
-	}
+	}*/
 }
