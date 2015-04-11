@@ -36,6 +36,7 @@ the ADCISC register
 #include "ADCT0ATrigger.h"
 #include "PLL.h"
 #include "ST7735.h"
+#include "Display.h"
 
 void Output_Init(void);
 /*
@@ -51,22 +52,29 @@ int main(void){
 	}
 	while (1);
 }*/
-
-void convert_to_temperature(int* val) {
-	
-}
 int main() {
 	PLL_Init();
   Output_Init();              // initialize output device
-	printf("hello world\n");
+	printf("Temperature:\n");
 	// 100 Hz with clock at 50MHz
 	ADC0_InitTimer0ATriggerSeq3(9, 500000);
+  int num_samples = 0;
+	double sum = 0.0;
 	while (1) {
 		while (!ADC_ready);
 		int my_val = ADC_val;
 		ADC_ready = FALSE;
-		convert_to_temperature(&my_val);
-		printf("%d\n", my_val);
+		Display_drawScreen(my_val);
+		/*sum += convert_to_temperature(my_val);
+		++num_samples;
+		if (num_samples >= 10){
+		  double temp = sum / num_samples;
+			num_samples = 0;
+			sum = 0.0;
+      ST7735_SetCursor(0,1);
+		  printf("%.2f C", temp);
+		}*/
+		// printf("%4d", my_val);
 	}
 	
 }
