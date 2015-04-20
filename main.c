@@ -22,12 +22,21 @@
  For more information about my classes, my research, and my books, see
  http://users.ece.utexas.edu/~valvano/
  */
+ /* Answers to prelab questions
+ 3 ways to trigger conversion: The controller (this is the default option), Timers, GPIO
+
+How to know conversion is done: 
+A raw interrupt is enabled from the ADCSSCTL3 register (or the register corresponding to
+the correct sequencer) (found on page 821); cleared by writing a 1 to the IN*(0-3) bit in
+the ADCISC register
+*/
 
 #include <stdio.h>
 #include <stdint.h> // C99 variable types
-//#include "ADCSWTrigger.h"
 #include "ADCT0ATrigger.h"
 #include "PLL.h"
+#include "ST7735.h"
+#include "Display.h"
 
 void Output_Init(void);
 /*
@@ -37,28 +46,35 @@ int main(void){
 	printf("hello world\n");
 	// 1000 Hz with clock at 50MHz
 	ADC0_InitTimer0ATriggerSeq3(9, 50000);
-	while (cnt < 1000);
-	for (int i = 0; i < 1000; ++i){
+	while (cnt < 100);
+	for (int i = 0; i < 100; ++i){
 		printf("%d\n", result[i]);
 	}
 	while (1);
-}
-*/
-void convert_to_temperature(int* val) {
-	
-}
+}*/
 int main() {
 	PLL_Init();
   Output_Init();              // initialize output device
-	printf("hello world\n");
+	printf("Temperature:\n");
 	// 100 Hz with clock at 50MHz
 	ADC0_InitTimer0ATriggerSeq3(9, 500000);
+  int num_samples = 0;
+	double sum = 0.0;
 	while (1) {
 		while (!ADC_ready);
 		int my_val = ADC_val;
 		ADC_ready = FALSE;
-		convert_to_temperature(&my_val);
-		printf("%d", my_val);
+		Display_drawScreen(my_val);
+		/*sum += convert_to_temperature(my_val);
+		++num_samples;
+		if (num_samples >= 10){
+		  double temp = sum / num_samples;
+			num_samples = 0;
+			sum = 0.0;
+      ST7735_SetCursor(0,1);
+		  printf("%.2f C", temp);
+		}*/
+		// printf("%4d", my_val);
 	}
 	
 }
